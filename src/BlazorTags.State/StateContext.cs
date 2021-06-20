@@ -3,14 +3,13 @@
 // ** This class is based loosely on EditContext.cs - https://github.com/dotnet/aspnetcore/blob/main/src/Components/Forms/src/EditContext.cs
 
 using BlazorTags.State.Interfaces;
-using Microsoft.AspNetCore.Components.Forms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace BlazorTags.State
 {
-    public class StateContext<TState, TReducer> : IStateContext
+    public class StateContext<TState, TReducer> : IFormContext, IStateContext<TState>
         where TReducer : IReducer<TState>, new()
     {
         private TState _state;

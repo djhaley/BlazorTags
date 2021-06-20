@@ -1,13 +1,8 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
-
-namespace BlazorTags.State.Interfaces
+﻿namespace BlazorTags.State.Interfaces
 {
-    public interface IStateContext
+    public interface IStateContext<TState>
     {
-        bool Validate();
-        bool TryGetPropertyData(object model, string propertyName, out PropertyData propertyData);
+        TState State { get; }
         void Dispatch(IStateAction action);
-        void NotifyOfStateChange();
-        void RegisterFormField(PropertyData propertyData);
     }
 }

@@ -21,7 +21,7 @@ namespace BlazorTags.State.Forms
         private PropertyInfo _modelProperty;
 
         [CascadingParameter] 
-        IStateContext CascadedStateContext { get; set; } = default!;
+        IFormContext CascadedFormContext { get; set; } = default!;
 
         [Parameter(CaptureUnmatchedValues = true)] 
         public IReadOnlyDictionary<string, object> AdditionalAttributes { get; set; }
@@ -39,10 +39,10 @@ namespace BlazorTags.State.Forms
         {
             parameters.SetParameterProperties(this);
 
-            if (CascadedStateContext == null)
+            if (CascadedFormContext == null)
             {
                 throw new InvalidOperationException($"{GetType()} requires a cascading parameter " +
-                    $"of type {nameof(IStateContext)}. {GetType().FullName} should always be used inside " +
+                    $"of type {nameof(IFormContext)}. {GetType().FullName} should always be used inside " +
                     $"a StateForm.");
             }
 
@@ -56,14 +56,14 @@ namespace BlazorTags.State.Forms
                 throw new InvalidOperationException($"{GetType()} requires a value for the 'PropertyName' parameter.");
             }
 
-            if (CascadedStateContext.TryGetPropertyData(Model, PropertyName, out PropertyData propertyData))
+            if (CascadedFormContext.TryGetPropertyData(Model, PropertyName, out PropertyData propertyData))
             {
                 PropertyData = propertyData;
             }
             else
             {
                 PropertyData = new PropertyData(Model, PropertyName);
-                CascadedStateContext.RegisterFormField(PropertyData);
+                CascadedFormContext.RegisterFormField(PropertyData);
             }
 
             _nullableUnderlyingType = Nullable.GetUnderlyingType(typeof(TValue));
@@ -85,7 +85,7 @@ namespace BlazorTags.State.Forms
                 var hasChanged = !EqualityComparer<TValue>.Default.Equals(value, currentValue);
                 if (hasChanged)
                 {
-                    CascadedStateContext.Dispatch(ActionCreator(value));
+                    CascadedFormContext.Dispatch(ActionCreator(value));
                 }
             }
         }
@@ -110,7 +110,7 @@ namespace BlazorTags.State.Forms
                 {
                     // We couldn't parse the value, so we need to flag the field as invalid and let the context know
                     PropertyData.IsValid = false;
-                    CascadedStateContext.NotifyOfStateChange();
+                    CascadedFormContext.NotifyOfStateChange();
                 }
             }
         }

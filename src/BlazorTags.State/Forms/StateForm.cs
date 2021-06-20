@@ -86,10 +86,17 @@ namespace BlazorTags.State.Forms
             builder.OpenElement(0, "form");
             builder.AddMultipleAttributes(1, AdditionalAttributes);
             builder.AddAttribute(2, "onsubmit", _handleSubmitDelegate);
-            builder.OpenComponent<CascadingValue<IStateContext>>(3);
+            builder.OpenComponent<CascadingValue<IFormContext>>(3);
             builder.AddAttribute(4, "IsFixed", true);
             builder.AddAttribute(5, "Value", _stateContext);
-            builder.AddAttribute(6, "ChildContent", ChildContent?.Invoke(_stateContext));
+            builder.AddAttribute(6, "ChildContent", (RenderFragment)((builder2) =>
+            {
+                builder2.OpenComponent<CascadingValue<IStateContext<TState>>>(7);
+                builder2.AddAttribute(8, "IsFixed", true);
+                builder2.AddAttribute(9, "Value", _stateContext);
+                builder2.AddAttribute(10, "ChildContent", ChildContent?.Invoke(_stateContext));
+                builder2.CloseComponent();
+            }));
             builder.CloseComponent();
             builder.CloseElement();
 
