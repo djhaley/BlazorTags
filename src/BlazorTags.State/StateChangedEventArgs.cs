@@ -1,7 +1,7 @@
 ﻿using BlazorTags.State.Interfaces;
 using System;
 
-namespace BlazorTags.State.State
+namespace BlazorTags.State
 {
     public class StateChangedEventArgs : EventArgs
     {

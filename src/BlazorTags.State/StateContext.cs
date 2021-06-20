@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BlazorTags.State.State
+namespace BlazorTags.State
 {
     public class StateContext<TState, TReducer> : IStateContext
         where TReducer : IReducer<TState>, new()
