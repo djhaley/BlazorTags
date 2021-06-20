@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-
-namespace BlazorTags.State.Interfaces
+﻿namespace BlazorTags.State.Interfaces
 {
     public interface IFormContext
     {
+        // StateContext methods needed by input components - not aware of TState
+
         bool TryGetPropertyData(object model, string propertyName, out PropertyData propertyData);
         PropertyData GetPropertyData(object model, string propertyName);
         void Dispatch(IStateAction action);

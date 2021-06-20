@@ -4,8 +4,12 @@ namespace BlazorTags.State.Interfaces
 {
     public interface IStateContext<TState>
     {
+        // State methods used by non-Input components - TState aware
+
+        event EventHandler<StateChangedEventArgs> StateChanged;
+
         TState State { get; }
         void Dispatch(IStateAction action);
-        event EventHandler<StateChangedEventArgs> StateChanged;
+        void NotifyOfStateChange();
     }
 }
