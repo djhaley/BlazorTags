@@ -1,4 +1,9 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+// ** This class is the same as InputText.cs, with the exception of inheriting from StateInputBase
+// https://github.com/dotnet/aspnetcore/blob/main/src/Components/Web/src/Forms/InputText.cs
+
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using System.Diagnostics.CodeAnalysis;
 

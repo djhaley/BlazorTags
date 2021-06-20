@@ -1,4 +1,8 @@
-﻿using BlazorTags.State.Interfaces;
+﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+// ** This class is based on EditForm.cs - https://github.com/dotnet/aspnetcore/blob/main/src/Components/Web/src/Forms/EditForm.cs
+
+using BlazorTags.State.Interfaces;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using System;
@@ -35,14 +39,9 @@ namespace BlazorTags.State.Forms
                 if (value != null)
                 {
                     _stateContext = value;
-                    _stateContext.StateChanged += _stateContext_StateChanged;
+                    _stateContext.StateChanged += (sender, args) => StateHasChanged();
                 }
             }
-        }
-
-        private void _stateContext_StateChanged(object sender, StateChangedEventArgs e)
-        {
-            StateHasChanged();
         }
 
         [Parameter] 

@@ -1,4 +1,8 @@
-﻿using BlazorTags.State.Interfaces;
+﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+// ** This class is based loosely on EditContext.cs - https://github.com/dotnet/aspnetcore/blob/main/src/Components/Forms/src/EditContext.cs
+
+using BlazorTags.State.Interfaces;
 using Microsoft.AspNetCore.Components.Forms;
 using System;
 using System.Collections.Generic;
