@@ -5,7 +5,6 @@
 
 using BlazorTags.State.Interfaces;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -102,7 +101,7 @@ namespace BlazorTags.State.Forms
                     // not reject Nullable<T> based on the type itself).
                     CurrentValue = default!;
                 }
-                else if (TryParseValueFromString(value, out var parsedValue, out var validationErrorMessage))
+                else if (TryParseValueFromString(value, out var parsedValue))
                 {
                     CurrentValue = parsedValue!;
                 }
@@ -110,14 +109,14 @@ namespace BlazorTags.State.Forms
                 {
                     // We couldn't parse the value, so we need to flag the field as invalid and let the context know
                     PropertyData.IsValid = false;
-                    CascadedFormContext.NotifyOfStateChange();
+                    CascadedFormContext.NotifyOfStateChange(new List<PropertyData> { PropertyData });
                 }
             }
         }
 
         protected virtual string FormatValueAsString(TValue value) => value.ToString();
 
-        protected abstract bool TryParseValueFromString(string value, [MaybeNullWhen(false)] out TValue result, [NotNullWhen(false)] out string validationErrorMessage);
+        protected abstract bool TryParseValueFromString(string value, [MaybeNullWhen(false)] out TValue result);
 
         protected string CssClass
         {

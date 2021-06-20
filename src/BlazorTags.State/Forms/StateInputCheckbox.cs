@@ -12,7 +12,8 @@ namespace BlazorTags.State.Forms
 {
     public class StateInputCheckbox<TModel> : StateInputBase<bool, TModel>
     {
-        [DisallowNull] public ElementReference Element { get; protected set; }
+        [DisallowNull] 
+        public ElementReference Element { get; protected set; }
 
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {
@@ -26,7 +27,7 @@ namespace BlazorTags.State.Forms
             builder.CloseElement();
         }
 
-        protected override bool TryParseValueFromString(string value, out bool result, [NotNullWhen(false)] out string validationErrorMessage)
+        protected override bool TryParseValueFromString(string value, out bool result)
         => throw new NotSupportedException($"This component does not parse string inputs. Bind to the '{nameof(CurrentValue)}' property, not '{nameof(CurrentValueAsString)}'.");
     }
 }

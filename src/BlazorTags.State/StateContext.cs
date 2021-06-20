@@ -31,9 +31,14 @@ namespace BlazorTags.State
 
         public bool TryGetPropertyData(object model, string propertyName, out PropertyData propertyData)
         {
-            propertyData = _formFields.SingleOrDefault(field => ReferenceEquals(model, field.Model) &&
-                string.Equals(propertyName, field.PropertyName, StringComparison.Ordinal));
+            propertyData = GetPropertyData(model, propertyName);
             return propertyData != null;
+        }
+
+        public PropertyData GetPropertyData(object model, string propertyName)
+        {
+            return _formFields.SingleOrDefault(field => ReferenceEquals(model, field.Model) &&
+                string.Equals(propertyName, field.PropertyName, StringComparison.Ordinal));
         }
 
         public void Dispatch(IStateAction action)
@@ -45,14 +50,19 @@ namespace BlazorTags.State
 
         public bool Validate() => !_formFields.Any(field => !field.IsValid);
 
-        public void NotifyOfStateChange()
+        public void NotifyOfStateChange(List<PropertyData> propertyDataChanges)
         {
-            OnStateChanged(new StateChangedEventArgs());
+            OnStateChanged(new StateChangedEventArgs { ChangedProperties = propertyDataChanges });
         }
 
         public void RegisterFormField(PropertyData propertyData)
         {
             if (!_formFields.Contains(propertyData)) _formFields.Add(propertyData);
+        }
+
+        public void RegisterForStateChanges(object model, string propertyName)
+        {
+
         }
 
         protected virtual void OnStateChanged(StateChangedEventArgs eventArgs)

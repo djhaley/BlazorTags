@@ -24,7 +24,7 @@ namespace BlazorTags.State.Forms
             _handleSubmitDelegate = HandleSubmitAsync;
         }
 
-        [Parameter(CaptureUnmatchedValues = true)] 
+        [Parameter(CaptureUnmatchedValues = true)]
         public IReadOnlyDictionary<string, object> AdditionalAttributes { get; set; }
 
         [Parameter]
@@ -36,13 +36,18 @@ namespace BlazorTags.State.Forms
                 if (_stateContext == null && value != null)
                 {
                     _stateContext = value;
-                    _stateContext.StateChanged += (sender, args) => StateHasChanged();
+                    _stateContext.StateChanged += OnStateChanged;
                 }
             }
         }
 
+        private void OnStateChanged (object sender, StateChangedEventArgs args)
+        {
+            StateHasChanged();
+        }
+
         [Parameter] 
-        public RenderFragment<StateContext<TState, TReducer>> ChildContent { get; set; }
+        public RenderFragment ChildContent { get; set; }
 
         [Parameter] 
         public EventCallback<StateContext<TState, TReducer>> OnSubmit { get; set; }
@@ -94,7 +99,7 @@ namespace BlazorTags.State.Forms
                 builder2.OpenComponent<CascadingValue<IStateContext<TState>>>(7);
                 builder2.AddAttribute(8, "IsFixed", true);
                 builder2.AddAttribute(9, "Value", _stateContext);
-                builder2.AddAttribute(10, "ChildContent", ChildContent?.Invoke(_stateContext));
+                builder2.AddAttribute(10, "ChildContent", ChildContent);
                 builder2.CloseComponent();
             }));
             builder.CloseComponent();

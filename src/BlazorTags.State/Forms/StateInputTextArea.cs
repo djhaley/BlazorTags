@@ -1,23 +1,22 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
-// ** This class is the same as InputText.cs, with the exception of inheriting from StateInputBase
-// https://github.com/dotnet/aspnetcore/blob/main/src/Components/Web/src/Forms/InputText.cs
+// ** This class is the same as InputTextArea.cs, with the exception of inheriting from StateInputBase
+// https://github.com/dotnet/aspnetcore/blob/main/src/Components/Web/src/Forms/InputTextArea.cs
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
-using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace BlazorTags.State.Forms
 {
-    public class StateInputText<TModel> : StateInputBase<string, TModel>
+    public class StateInputTextArea<TModel> : StateInputBase<string, TModel>
     {
         [DisallowNull] 
         public ElementReference Element { get; protected set; }
 
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {
-            builder.OpenElement(0, "input");
+            builder.OpenElement(0, "textarea");
             builder.AddMultipleAttributes(1, AdditionalAttributes);
             builder.AddAttribute(2, "class", CssClass);
             builder.AddAttribute(3, "value", BindConverter.FormatValue(CurrentValue));
@@ -30,11 +29,6 @@ namespace BlazorTags.State.Forms
         {
             result = value;
             return true;
-        }
-
-        protected override void OnAfterRender(bool firstRender)
-        {
-            base.OnAfterRender(firstRender);
         }
     }
 }
