@@ -2,6 +2,6 @@
 {
     public interface IReducer<TState>
     {
-        ReducedStateInfo<TState> Reduce(TState previousState, IStateAction action);
+        void Reduce(TState state, IStateAction action, IStateContext stateContext);
     }
 }

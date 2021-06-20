@@ -33,10 +33,7 @@ namespace BlazorTags.State.Forms
             get => _stateContext;
             set
             {
-                if (_stateContext != null)
-                    throw new InvalidOperationException("StateContext can not be set more than once");
-
-                if (value != null)
+                if (_stateContext == null && value != null)
                 {
                     _stateContext = value;
                     _stateContext.StateChanged += (sender, args) => StateHasChanged();

@@ -56,7 +56,16 @@ namespace BlazorTags.State.Forms
                 throw new InvalidOperationException($"{GetType()} requires a value for the 'PropertyName' parameter.");
             }
 
-            FieldIdentifier = new FieldIdentifier(Model, PropertyName);
+            if (CascadedStateContext.TryGetPropertyData(Model, PropertyName, out PropertyData propertyData))
+            {
+                PropertyData = propertyData;
+            }
+            else
+            {
+                PropertyData = new PropertyData(Model, PropertyName);
+                CascadedStateContext.RegisterFormField(PropertyData);
+            }
+
             _nullableUnderlyingType = Nullable.GetUnderlyingType(typeof(TValue));
 
             UpdateAdditionalValidationAttributes();
@@ -65,7 +74,7 @@ namespace BlazorTags.State.Forms
             return base.SetParametersAsync(ParameterView.Empty);
         }
 
-        protected FieldIdentifier FieldIdentifier { get; set; }
+        protected PropertyData PropertyData { get; set; }
 
         protected TValue CurrentValue
         {
@@ -99,8 +108,9 @@ namespace BlazorTags.State.Forms
                 }
                 else
                 {
-                    // Since we're not writing to CurrentValue, we'll need to notify about modification from here
-                    CascadedStateContext.NotifyOfInvalidField(FieldIdentifier);
+                    // We couldn't parse the value, so we need to flag the field as invalid and let the context know
+                    PropertyData.IsValid = false;
+                    CascadedStateContext.NotifyOfStateChange();
                 }
             }
         }
@@ -117,22 +127,20 @@ namespace BlazorTags.State.Forms
                     AdditionalAttributes.TryGetValue("class", out var @class) &&
                     !string.IsNullOrEmpty(Convert.ToString(@class, CultureInfo.InvariantCulture)))
                 {
-                    return $"{@class} {FieldClass}";
+                    return $"{@class} {PropertyData.CssClass}";
                 }
 
-                return FieldClass; // Never null or empty
+                return PropertyData.CssClass;
             }
         }
-        private string FieldClass => CascadedStateContext.FieldCssClass(FieldIdentifier);
 
         private void UpdateAdditionalValidationAttributes()
         {
             var hasAriaInvalidAttribute = AdditionalAttributes != null && AdditionalAttributes.ContainsKey("aria-invalid");
-            if (!CascadedStateContext.IsValid(FieldIdentifier))
+            if (PropertyData.IsValid)
             {
                 if (hasAriaInvalidAttribute)
                 {
-                    // Do not overwrite the attribute value
                     return;
                 }
 
@@ -141,16 +149,12 @@ namespace BlazorTags.State.Forms
                     AdditionalAttributes = additionalAttributes;
                 }
 
-                // To make the `Input` components accessible by default
-                // we will automatically render the `aria-invalid` attribute when the validation fails
                 additionalAttributes["aria-invalid"] = true;
             }
             else if (hasAriaInvalidAttribute)
             {
-                // No validation errors. Need to remove `aria-invalid` if it was rendered already
                 if (AdditionalAttributes!.Count == 1)
                 {
-                    // Only aria-invalid argument is present which we don't need any more
                     AdditionalAttributes = null;
                 }
                 else

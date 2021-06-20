@@ -4,11 +4,10 @@ namespace BlazorTags.State.Interfaces
 {
     public interface IStateContext
     {
-        string FieldCssClass(FieldIdentifier fieldIdentifier);
-        bool IsValid(FieldIdentifier fieldIdentifier);
         bool Validate();
-
+        bool TryGetPropertyData(object model, string propertyName, out PropertyData propertyData);
         void Dispatch(IStateAction action);
-        void NotifyOfInvalidField(FieldIdentifier fieldIdentifier);
+        void NotifyOfStateChange();
+        void RegisterFormField(PropertyData propertyData);
     }
 }

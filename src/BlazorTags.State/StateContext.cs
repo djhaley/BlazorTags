@@ -16,7 +16,9 @@ namespace BlazorTags.State
         private TState _state;
         private TReducer _rootReducer;
 
-        private List<FieldIdentifier> _invalidFields = new List<FieldIdentifier>();
+        // State itself may encompass much more than form fields, but for tracking what
+        //  is displayed on a form we'll capture anything registered by an input
+        private List<PropertyData> _formFields = new List<PropertyData>();
 
         public StateContext(TState initialState)
         {
@@ -28,32 +30,30 @@ namespace BlazorTags.State
 
         public TState State { get => _state; }
 
+        public bool TryGetPropertyData(object model, string propertyName, out PropertyData propertyData)
+        {
+            propertyData = _formFields.SingleOrDefault(field => ReferenceEquals(model, field.Model) &&
+                string.Equals(propertyName, field.PropertyName, StringComparison.Ordinal));
+            return propertyData != null;
+        }
+
         public void Dispatch(IStateAction action)
         {
-            var reducedState = _rootReducer.Reduce(_state, action);
-            
-            _state = reducedState.State;
-            _invalidFields = reducedState.InvalidFields;
+            // We mutate state because all of our form field change tracking is dependent
+            // on referencing objects within state. History tracking could be added here
+            _rootReducer.Reduce(_state, action, this);
+        }
 
+        public bool Validate() => !_formFields.Any(field => !field.IsValid);
+
+        public void NotifyOfStateChange()
+        {
             OnStateChanged(new StateChangedEventArgs());
         }
 
-        public string FieldCssClass(FieldIdentifier fieldIdentifier)
+        public void RegisterFormField(PropertyData propertyData)
         {
-            if (_invalidFields.Contains(fieldIdentifier)) return "invalid";
-            return "valid";
-        }
-
-        public bool IsValid(FieldIdentifier fieldIdentifier) => !_invalidFields.Contains(fieldIdentifier);
-
-        public bool Validate() => !_invalidFields.Any();
-
-        public void NotifyOfInvalidField(FieldIdentifier fieldIdentifier)
-        {
-            if (!_invalidFields.Contains(fieldIdentifier))
-                _invalidFields.Add(fieldIdentifier);
-
-            OnStateChanged(new StateChangedEventArgs());
+            if (!_formFields.Contains(propertyData)) _formFields.Add(propertyData);
         }
 
         protected virtual void OnStateChanged(StateChangedEventArgs eventArgs)
