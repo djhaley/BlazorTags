@@ -5,11 +5,14 @@
 
     <p>Field Updates: @stateContext.State.FieldsUpdated</p>
 
-    <StateInputText Expression="() => stateContext.State.Name"
+    <StateInputText ValueExpression="() => stateContext.State.Name"
                     ActionCreator="value => new UpdateNameAction(value)"></StateInputText>
 
-    <StateInputNumber Expression="() => stateContext.State.Age"
+    <StateInputNumber ValueExpression="() => stateContext.State.Age"
                       ActionCreator="value => new UpdateAgeAction(value)"></StateInputNumber>
+
+    <br /><br />
+    @stateContext.GetValidationMessage(stateContext.State, "Age")
 </StateForm>
 
 @code {

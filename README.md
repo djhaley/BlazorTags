@@ -18,6 +18,7 @@ BlazorTags.State is an easy-to-use replacement for EditForm, EditContext, and th
 This is Counter.razor from BlazorTag.Samples, which is simply a new Blazor WebAssembly project with the changes mentioned above.
 - StateInputText (and Number, Checkbox, etc) for the most part act like their counterparts in the Microsoft.AspNetCore.Components.Forms namespace.
 - One change is that @bind-Value is not used since that is tightly tied to the two-way binding in EditContext. Instead, simply provide an expression that specifies the value bound to this input.
+- In addition to ValueExpression, provide a Func<IStateAction> in the ActionCreator field that will be used when the value changes.
 - Another change is that your reducer will also be responsible for validating your model.
 ```csharp
 @page "/counter"
@@ -27,10 +28,10 @@ This is Counter.razor from BlazorTag.Samples, which is simply a new Blazor WebAs
 
     <p>Field Updates: @stateContext.State.FieldsUpdated</p>
 
-    <StateInputText Expression="() => stateContext.State.Name"
+    <StateInputText ValueExpression="() => stateContext.State.Name"
                     ActionCreator="value => new UpdateNameAction(value)"></StateInputText>
 
-    <StateInputNumber Expression="() => stateContext.State.Age"
+    <StateInputNumber ValueExpression="() => stateContext.State.Age"
                       ActionCreator="value => new UpdateAgeAction(value)"></StateInputNumber>
 </StateForm>
 

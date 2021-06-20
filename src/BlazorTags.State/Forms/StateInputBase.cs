@@ -27,7 +27,7 @@ namespace BlazorTags.State.Forms
         public IReadOnlyDictionary<string, object> AdditionalAttributes { get; set; }
 
         [Parameter]
-        public Expression<Func<TValue>> Expression { get; set; }
+        public Expression<Func<TValue>> ValueExpression { get; set; }
 
         [Parameter]
         public Func<TValue, IStateAction> ActionCreator { get; set; }
@@ -43,12 +43,12 @@ namespace BlazorTags.State.Forms
                     $"a StateForm.");
             }
 
-            if (Expression == null)
+            if (ValueExpression == null)
             {
                 throw new InvalidOperationException($"{GetType()} requires a value for the 'Expression' parameter.");
             }
 
-            var expressionPropertyData = PropertyData.Create(Expression);
+            var expressionPropertyData = PropertyData.Create(ValueExpression);
             if (CascadedFormContext.TryGetPropertyData(expressionPropertyData.Model, expressionPropertyData.PropertyName, out PropertyData propertyData))
             {
                 PropertyData = propertyData;
