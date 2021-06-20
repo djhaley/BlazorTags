@@ -1,0 +1,58 @@
+﻿@page "/counter"
+
+<StateForm StateContext="stateContext" TState="Model" TReducer="Reducer">
+    <h1>Counter</h1>
+
+    <p>Field Updates: @stateContext.State.FieldsUpdated</p>
+
+    <StateInputText Expression="() => stateContext.State.Name"
+                    ActionCreator="value => new UpdateNameAction(value)"></StateInputText>
+
+    <StateInputNumber Expression="() => stateContext.State.Age"
+                      ActionCreator="value => new UpdateAgeAction(value)"></StateInputNumber>
+</StateForm>
+
+@code {
+
+    private StateContext<Model, Reducer> stateContext;
+
+    protected override void OnInitialized()
+    {
+        var model = new Model("Dan", 29, 0);
+        stateContext = new StateContext<Model, Reducer>(model);
+
+        base.OnInitialized();
+    }
+
+
+
+    private record Model(string Name, int Age, int FieldsUpdated);
+
+    private class Reducer : IReducer<Model>
+    {
+        public Model Reduce(Model state, IStateAction action)
+        {
+            switch (action)
+            {
+                case UpdateNameAction a:
+                    return state with { Name = a.NewName, FieldsUpdated = state.FieldsUpdated + 1 };
+                case UpdateAgeAction a:
+                    return state with { Age = a.NewAge, FieldsUpdated = state.FieldsUpdated + 1 };
+                default:
+                    return state;
+            }
+        }
+
+        public void Validate(Model state, IFormContext formContext)
+        {
+            if (state.Age < 12 && formContext.TryGetPropertyData(state, "Age", out PropertyData ageData))
+            {
+                ageData.IsValid = false;
+                ageData.ValidationMessage = "You must be 12 to ride this amusement park attraction";
+            }
+        }
+    }
+
+    private record UpdateNameAction(string NewName) : IStateAction;
+    private record UpdateAgeAction(int NewAge) : IStateAction;
+}

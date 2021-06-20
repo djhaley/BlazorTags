@@ -35,6 +35,12 @@ namespace BlazorTags.State
             return propertyData != null;
         }
 
+        public string GetValidationMessage(object model, string propertyName)
+        {
+            if (!TryGetPropertyData(model, propertyName, out PropertyData propertyData)) return "";
+            return propertyData.ValidationMessage;
+        }
+
         public PropertyData GetPropertyData(object model, string propertyName)
         {
             return _formFields.SingleOrDefault(field => ReferenceEquals(model, field.Model) &&
@@ -44,7 +50,7 @@ namespace BlazorTags.State
         public void Dispatch(IStateAction action)
         {
             _state = _rootReducer.Reduce(_state, action);
-            _formFields.ForEach(field => field.Model = _state);
+            _formFields.ForEach(field => { field.Model = _state; field.IsValid = true; });
 
             _rootReducer.Validate(_state, this);
 

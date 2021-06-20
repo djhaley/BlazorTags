@@ -15,7 +15,9 @@ namespace BlazorTags.State
     {
         private object _model;
         private PropertyInfo _propertyInfo;
+        
         private string _originalValueAsJson;
+        private bool _isValid = true;
 
         public static PropertyData Create<TField>(Expression<Func<TField>> accessor)
         {
@@ -50,7 +52,17 @@ namespace BlazorTags.State
         }
 
         public string PropertyName { get; }
-        public bool IsValid { get; set; } = true;
+        public bool IsValid 
+        {
+            get => _isValid;
+            set
+            {
+                _isValid = value;
+                if (value) ValidationMessage = "";
+            }
+        }
+
+        public string ValidationMessage { get; set; }
         public string CssClass { get => (IsModified() ? "modified " : "") + (IsValid ? "valid" : "invalid"); }
 
         public bool IsModified() 
