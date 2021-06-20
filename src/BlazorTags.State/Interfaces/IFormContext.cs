@@ -7,7 +7,7 @@ namespace BlazorTags.State.Interfaces
         bool TryGetPropertyData(object model, string propertyName, out PropertyData propertyData);
         PropertyData GetPropertyData(object model, string propertyName);
         void Dispatch(IStateAction action);
-        void NotifyOfStateChange(List<PropertyData> propertyDataChanges);
+        void NotifyOfStateChange();
         void RegisterFormField(PropertyData propertyData);
     }
 }

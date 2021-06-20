@@ -10,7 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace BlazorTags.State.Forms
 {
-    public class StateInputCheckbox<TModel> : StateInputBase<bool, TModel>
+    public class StateInputCheckbox : StateInputBase<bool>
     {
         [DisallowNull] 
         public ElementReference Element { get; protected set; }

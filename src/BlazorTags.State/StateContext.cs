@@ -43,26 +43,24 @@ namespace BlazorTags.State
 
         public void Dispatch(IStateAction action)
         {
-            // We mutate state because all of our form field change tracking is dependent
-            // on referencing objects within state. History tracking could be added here
-            _rootReducer.Reduce(_state, action, this);
+            _state = _rootReducer.Reduce(_state, action);
+            _formFields.ForEach(field => field.Model = _state);
+
+            _rootReducer.Validate(_state, this);
+
+            NotifyOfStateChange();
         }
 
         public bool Validate() => !_formFields.Any(field => !field.IsValid);
 
-        public void NotifyOfStateChange(List<PropertyData> propertyDataChanges)
+        public void NotifyOfStateChange()
         {
-            OnStateChanged(new StateChangedEventArgs { ChangedProperties = propertyDataChanges });
+            OnStateChanged(new StateChangedEventArgs());
         }
 
         public void RegisterFormField(PropertyData propertyData)
         {
             if (!_formFields.Contains(propertyData)) _formFields.Add(propertyData);
-        }
-
-        public void RegisterForStateChanges(object model, string propertyName)
-        {
-
         }
 
         protected virtual void OnStateChanged(StateChangedEventArgs eventArgs)

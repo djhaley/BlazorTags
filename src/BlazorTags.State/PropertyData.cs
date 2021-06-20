@@ -13,6 +13,7 @@ namespace BlazorTags.State
 {
     public class PropertyData : IEquatable<PropertyData>
     {
+        private object _model;
         private PropertyInfo _propertyInfo;
         private string _originalValueAsJson;
 
@@ -29,27 +30,38 @@ namespace BlazorTags.State
             if (model == null) throw new ArgumentNullException(nameof(model));
             if (model.GetType().IsValueType) throw new ArgumentException("The model must be a reference-typed object.", nameof(model));
 
-            Model = model;
+            _model = model;
             PropertyName = propertyName ?? throw new ArgumentNullException(nameof(propertyName));
 
-            _propertyInfo = Model.GetType().GetProperty(PropertyName, BindingFlags.Public | BindingFlags.Instance);
-            _originalValueAsJson = JsonConvert.SerializeObject(_propertyInfo.GetValue(Model));
+            _propertyInfo = _model.GetType().GetProperty(PropertyName, BindingFlags.Public | BindingFlags.Instance);
+            _originalValueAsJson = JsonConvert.SerializeObject(_propertyInfo.GetValue(_model));
         }
 
-        public object Model { get; }
+        public object Model 
+        {
+            get => _model;
+            set
+            {
+                if (!value.GetType().Equals(_model.GetType()))
+                    throw new InvalidOperationException($"Updating the {nameof(Model)} property can only be done with the same type of object.");
+
+                _model = value;
+            }
+        }
+
         public string PropertyName { get; }
         public bool IsValid { get; set; } = true;
         public string CssClass { get => (IsModified() ? "modified " : "") + (IsValid ? "valid" : "invalid"); }
 
         public bool IsModified() 
         {
-            var currentValueAsJson = JsonConvert.SerializeObject(_propertyInfo.GetValue(Model));
+            var currentValueAsJson = JsonConvert.SerializeObject(_propertyInfo.GetValue(_model));
             return !string.Equals(currentValueAsJson, _originalValueAsJson, StringComparison.Ordinal);
         }
 
         public override int GetHashCode()
         {
-            var modelHash = RuntimeHelpers.GetHashCode(Model);
+            var modelHash = RuntimeHelpers.GetHashCode(_model);
             var fieldHash = StringComparer.Ordinal.GetHashCode(PropertyName);
 
             return (
@@ -65,7 +77,7 @@ namespace BlazorTags.State
         /// <inheritdoc />
         public bool Equals(PropertyData otherData)
         {
-            return ReferenceEquals(otherData.Model, Model) &&
+            return ReferenceEquals(otherData.Model, _model) &&
                 string.Equals(otherData.PropertyName, PropertyName, StringComparison.Ordinal);
         }
 

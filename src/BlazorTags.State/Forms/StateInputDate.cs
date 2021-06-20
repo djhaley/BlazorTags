@@ -12,7 +12,7 @@ using System.Globalization;
 
 namespace BlazorTags.State.Forms
 {
-    public class StateInputDate<TValue, TModel> : StateInputBase<TValue, TModel>
+    public class StateInputDate<TValue> : StateInputBase<TValue>
     {
         private const string DateFormat = "yyyy-MM-dd";
 

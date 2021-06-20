@@ -12,7 +12,7 @@ using System.Globalization;
 
 namespace BlazorTags.State.Forms
 {
-    public class StateInputSelect<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TValue, TModel> : StateInputBase<TValue, TModel>
+    public class StateInputSelect<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TValue> : StateInputBase<TValue>
     {
         [Parameter] 
         public RenderFragment ChildContent { get; set; }

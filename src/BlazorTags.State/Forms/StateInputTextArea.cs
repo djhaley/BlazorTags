@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace BlazorTags.State.Forms
 {
-    public class StateInputTextArea<TModel> : StateInputBase<string, TModel>
+    public class StateInputTextArea : StateInputBase<string>
     {
         [DisallowNull] 
         public ElementReference Element { get; protected set; }

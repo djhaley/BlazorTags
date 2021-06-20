@@ -9,12 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 
 namespace BlazorTags.State.Forms
 {
-    public abstract class StateInputBase<TValue, TModel> : ComponentBase
+    public abstract class StateInputBase<TValue> : ComponentBase
     {
         private Type _nullableUnderlyingType;
         private PropertyInfo _modelProperty;
@@ -26,10 +27,7 @@ namespace BlazorTags.State.Forms
         public IReadOnlyDictionary<string, object> AdditionalAttributes { get; set; }
 
         [Parameter]
-        public TModel Model { get; set; }
-
-        [Parameter]
-        public string PropertyName { get; set; }
+        public Expression<Func<TValue>> Expression { get; set; }
 
         [Parameter]
         public Func<TValue, IStateAction> ActionCreator { get; set; }
@@ -45,23 +43,19 @@ namespace BlazorTags.State.Forms
                     $"a StateForm.");
             }
 
-            if (Model == null)
+            if (Expression == null)
             {
-                throw new InvalidOperationException($"{GetType()} requires a value for the 'Model' parameter.");
+                throw new InvalidOperationException($"{GetType()} requires a value for the 'Expression' parameter.");
             }
 
-            if (PropertyName == null)
-            {
-                throw new InvalidOperationException($"{GetType()} requires a value for the 'PropertyName' parameter.");
-            }
-
-            if (CascadedFormContext.TryGetPropertyData(Model, PropertyName, out PropertyData propertyData))
+            var expressionPropertyData = PropertyData.Create(Expression);
+            if (CascadedFormContext.TryGetPropertyData(expressionPropertyData.Model, expressionPropertyData.PropertyName, out PropertyData propertyData))
             {
                 PropertyData = propertyData;
             }
             else
             {
-                PropertyData = new PropertyData(Model, PropertyName);
+                PropertyData = expressionPropertyData;
                 CascadedFormContext.RegisterFormField(PropertyData);
             }
 
@@ -109,7 +103,7 @@ namespace BlazorTags.State.Forms
                 {
                     // We couldn't parse the value, so we need to flag the field as invalid and let the context know
                     PropertyData.IsValid = false;
-                    CascadedFormContext.NotifyOfStateChange(new List<PropertyData> { PropertyData });
+                    CascadedFormContext.NotifyOfStateChange();
                 }
             }
         }
@@ -196,10 +190,10 @@ namespace BlazorTags.State.Forms
         {
             if (_modelProperty == null)
             {
-                _modelProperty = Model.GetType().GetProperty(PropertyName, BindingFlags.Public | BindingFlags.Instance);
+                _modelProperty = PropertyData.Model.GetType().GetProperty(PropertyData.PropertyName, BindingFlags.Public | BindingFlags.Instance);
             }
 
-            return (TValue)_modelProperty.GetValue(Model);
+            return (TValue)_modelProperty.GetValue(PropertyData.Model);
         }
     }
 }

@@ -11,7 +11,7 @@ using System.Globalization;
 
 namespace BlazorTags.State.Forms
 {
-    public class StateInputNumber<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TValue, TModel> : StateInputBase<TValue, TModel>
+    public class StateInputNumber<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TValue> : StateInputBase<TValue>
     {
         private readonly static string _stepAttributeValue;
 

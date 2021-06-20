@@ -5,12 +5,11 @@
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
-using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace BlazorTags.State.Forms
 {
-    public class StateInputText<TModel> : StateInputBase<string, TModel>
+    public class StateInputText : StateInputBase<string>
     {
         [DisallowNull] 
         public ElementReference Element { get; protected set; }

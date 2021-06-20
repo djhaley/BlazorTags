@@ -97,7 +97,7 @@ namespace BlazorTags.State.Forms
             builder.AddAttribute(6, "ChildContent", (RenderFragment)((builder2) =>
             {
                 builder2.OpenComponent<CascadingValue<IStateContext<TState>>>(7);
-                builder2.AddAttribute(8, "IsFixed", true);
+                builder2.AddAttribute(8, "IsFixed", false);
                 builder2.AddAttribute(9, "Value", _stateContext);
                 builder2.AddAttribute(10, "ChildContent", ChildContent);
                 builder2.CloseComponent();
