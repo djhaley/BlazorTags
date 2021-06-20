@@ -12,4 +12,3 @@ C:\repos\BlazorTags\src\BlazorTags.State\obj\Debug\net5.0\BlazorTags.State.Razor
 C:\repos\BlazorTags\src\BlazorTags.State\obj\Debug\net5.0\BlazorTags.State.dll
 C:\repos\BlazorTags\src\BlazorTags.State\obj\Debug\net5.0\ref\BlazorTags.State.dll
 C:\repos\BlazorTags\src\BlazorTags.State\obj\Debug\net5.0\BlazorTags.State.pdb
-C:\repos\BlazorTags\src\BlazorTags.State\obj\Debug\net5.0\BlazorTags.State.csproj.AssemblyReference.cache

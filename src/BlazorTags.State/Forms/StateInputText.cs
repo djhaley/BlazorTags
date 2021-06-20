@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace BlazorTags.State.Forms
 {
-    public class StateInputText : StateInputBase<string>
+    public class StateInputText<TModel> : StateInputBase<string, TModel>
     {
         /// <summary>
         /// Gets or sets the associated <see cref="ElementReference"/>.
