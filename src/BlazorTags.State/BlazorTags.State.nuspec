@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>BlazorTags.State</id>
+    <version>$version$</version>
+    <title>BlazorTags.State</title>
+    <authors>Dan Haley</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">Apache</license>
+    <projectUrl>https://github.com/djhaley/BlazorTags</projectUrl>
+    <description>
+      An easy-to-use replacement for EditForm, EditContext, and the Input* components that provides
+      one-way data binding using Redux like state management.
+    </description>
+    <tags>blazor state</tags>
+  </metadata>
+</package>
