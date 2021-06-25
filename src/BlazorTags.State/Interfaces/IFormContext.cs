@@ -9,5 +9,6 @@
         void Dispatch(IStateAction action);
         void NotifyOfStateChange();
         void RegisterFormField(PropertyData propertyData);
+        string GetValidationMessage(object model, string propertyName);
     }
 }

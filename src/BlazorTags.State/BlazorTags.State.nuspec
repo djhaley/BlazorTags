@@ -9,10 +9,7 @@
     <license type="expression">Apache</license>
     <projectUrl>https://github.com/djhaley/BlazorTags</projectUrl>
     <repository type="git" url="https://github.com/djhaley/BlazorTags" />
-    <description>
-      An easy-to-use replacement for EditForm, EditContext, and the Input* components that provides
-      one-way data binding using Redux like state management.
-    </description>
-    <tags>blazor state</tags>
+    <description>An easy-to-use replacement for EditForm, EditContext, and the Input* components that provides one-way data binding using Redux like state management. https://github.com/djhaley/BlazorTags</description>
+    <tags>blazor state management</tags>
   </metadata>
 </package>
