@@ -2,9 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <PackageId>BlazorTags.State</PackageId>
+    <Version>0.2.0</Version>
+    <Title>BlazorTags.State</Title>
+    <Authors>Dan Haley</Authors>
+    <Description>An easy-to-use replacement for EditForm, EditContext, and the Input* components that provides one-way data binding using Redux like state management. [Source Code](https://github.com/djhaley/BlazorTags)</Description>
+    <RepositoryUrl>https://github.com/djhaley/BlazorTags</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>blazor state management</PackageTags>
+    <PackageProjectUrl>https://github.com/djhaley/BlazorTags</PackageProjectUrl>
   </PropertyGroup>
 
-  
   <ItemGroup>
     <SupportedPlatform Include="browser" />
   </ItemGroup>
