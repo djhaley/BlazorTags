@@ -6,9 +6,7 @@
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 
 namespace BlazorTags.State.Forms
 {
@@ -33,27 +31,6 @@ namespace BlazorTags.State.Forms
         }
 
         protected override bool TryParseValueFromString(string value, [MaybeNullWhen(false)] out TValue result)
-            => TryParseSelectableValueFromString(value, out result);
-
-        private bool TryParseSelectableValueFromString(string value, [MaybeNullWhen(false)] out TValue result)
-        {
-            try
-            {
-                if (BindConverter.TryConvertTo<TValue>(value, CultureInfo.CurrentCulture, out var parsedValue))
-                {
-                    result = parsedValue;
-                    return true;
-                }
-                else
-                {
-                    result = default;
-                    return false;
-                }
-            }
-            catch (InvalidOperationException ex)
-            {
-                throw new InvalidOperationException($"{GetType()} does not support the type '{typeof(TValue)}'.", ex);
-            }
-        }
+            => this.TryParseSelectableValueFromString(value, out result);
     }
 }

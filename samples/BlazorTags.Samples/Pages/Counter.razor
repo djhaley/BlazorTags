@@ -1,61 +1,81 @@
 ﻿@page "/counter"
 
 <StateForm StateContext="stateContext" TState="Model" TReducer="Reducer">
-    <h1>Counter</h1>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-10 offset-1">
+                <h1>BlazorTags</h1>
 
-    <p>Field Updates: @stateContext.State.FieldsUpdated</p>
+                <pre>
+                    @JsonConvert.SerializeObject(stateContext.State, Formatting.Indented)
+                </pre>
 
-    <StateInputText ValueExpression="() => stateContext.State.Name"
-                    ActionCreator="value => new UpdateNameAction(value)"></StateInputText>
+                <p><label>Field Updates:</label> @stateContext.State.FieldsUpdated</p>
 
-    <StateInputNumber ValueExpression="() => stateContext.State.Age"
-                      ActionCreator="value => new UpdateAgeAction(value)"></StateInputNumber>
+                <div class="mb-3">
+                    <label for="name">Name</label>
+                    <StateInputText ValueExpression="() => stateContext.State.Name"
+                                    ActionCreator="value => new UpdateNameAction(value)"
+                                    class="form-control" id="name" />
+                </div>
 
+                <div class="mb-3">
+                    <label for="age">Age</label>
+                    <StateInputNumber ValueExpression="() => stateContext.State.Age"
+                                      ActionCreator="value => new UpdateAgeAction(value)"
+                                      class="form-control" id="age" />
+                    @if (!string.IsNullOrEmpty(ageMessage))
+                    {
+                        <small class="form-text text-muted">@ageMessage</small>
+                    }
+                </div>
+
+                <div class="form-check">
+                    <label class="form-check-label" for="toggleNestedForm">Toggle Nested Form</label>
+
+                    <StateInputCheckbox ValueExpression="() => stateContext.State.ShowNestedForm"
+                                        ActionCreator="value => new ToggleShowNestedFormAction()"
+                                        class="form-check-input" id="toggleNestedForm" />
+                </div>
+
+                <br /><br />
+
+                @if (stateContext.State.ShowNestedForm)
+                {
+                    <NestedForm />
+                }
+            </div>
+        </div>
+    </div>
     <br /><br />
-    @stateContext.GetValidationMessage(stateContext.State, "Age")
+    <br /><br />
 </StateForm>
 
 @code {
 
     private StateContext<Model, Reducer> stateContext;
 
+    private string ageMessage;
+
     protected override void OnInitialized()
     {
-        var model = new Model("Dan", 29, 0);
+        var model = new Model(
+            "Dan", 
+            29, 
+            true, 
+            DateTime.Today,
+            "Blue",
+            "Washington",
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam non commodo dolor, sed porta ipsum.", 
+            0,
+            "29",
+            "#61ACEB"
+        );
+
         stateContext = new StateContext<Model, Reducer>(model);
+
+        stateContext.StateChanged += (sender, args) => ageMessage = stateContext.GetValidationMessage(stateContext.State, "Age");
 
         base.OnInitialized();
     }
-
-
-
-    private record Model(string Name, int Age, int FieldsUpdated);
-
-    private class Reducer : IReducer<Model>
-    {
-        public Model Reduce(Model state, IStateAction action)
-        {
-            switch (action)
-            {
-                case UpdateNameAction a:
-                    return state with { Name = a.NewName, FieldsUpdated = state.FieldsUpdated + 1 };
-                case UpdateAgeAction a:
-                    return state with { Age = a.NewAge, FieldsUpdated = state.FieldsUpdated + 1 };
-                default:
-                    return state;
-            }
-        }
-
-        public void Validate(Model state, IFormContext formContext)
-        {
-            if (state.Age < 12 && formContext.TryGetPropertyData(state, "Age", out PropertyData ageData))
-            {
-                ageData.IsValid = false;
-                ageData.ValidationMessage = "You must be 12 to ride this amusement park attraction";
-            }
-        }
-    }
-
-    private record UpdateNameAction(string NewName) : IStateAction;
-    private record UpdateAgeAction(int NewAge) : IStateAction;
 }

@@ -1,0 +1,82 @@
+﻿<h3>NestedForm</h3>
+
+<div class="mb-3">
+    <label for="date">Date</label>
+    <StateInputDate ValueExpression="() => StateContext.State.Date"
+                    ActionCreator="value => new UpdateDateAction(value)"
+                    class="form-control" id="name" />
+</div>
+
+<div class="mb-3">
+    <label for="color">RGB Choice</label>
+    <br />
+    <div class="btn-group">
+        <StateInputRadioGroup ValueExpression="() => StateContext.State.RgbChoice"
+                              ActionCreator="value => new UpdateRgbChoiceAction(value)">
+            <StateInputRadio Value="@("Red")" class="btn-check" id="redRadio" />
+            <label class="btn btn-outline-primary" for="redRadio">Red</label>
+
+            <StateInputRadio Value="@("Green")" class="btn-check" id="greenRadio" />
+            <label class="btn btn-outline-primary" for="greenRadio">Green</label>
+
+            <StateInputRadio Value="@("Blue")" class="btn-check" id="blueRadio" />
+            <label class="btn btn-outline-primary" for="blueRadio">Blue</label>
+        </StateInputRadioGroup>
+    </div>
+</div>
+
+
+<div class="mb-3">
+    <label for="stateSelect">State</label>
+    <StateInputSelect ValueExpression="() => StateContext.State.Selection"
+                      ActionCreator="value => new UpdateSelectionAction(value)"
+                      class="form-control" id="stateSelect">
+        <option>Washington</option>
+        <option>Idaho</option>
+        <option>Montana</option>
+    </StateInputSelect>
+
+    @if (!string.IsNullOrEmpty(FormContext.GetValidationMessage(StateContext.State, "Selection")))
+    {
+        <small class="form-text text-muted">@FormContext.GetValidationMessage(StateContext.State, "Selection")</small>
+    }
+</div>
+
+<div class="mb-3">
+    <label for="description">Description</label>
+    <StateInputTextArea ValueExpression="() => StateContext.State.Description"
+                        ActionCreator="value => new UpdateDescriptionAction(value)"
+                        class="form-control" id="description" />
+</div>
+
+<div class="mb-3">
+    <label for="password">Password</label>
+    <StateInputText ValueExpression="() => StateContext.State.Name"
+                    ActionCreator="value => new UpdateNameAction(value)"
+                    type="password" class="form-control" id="password" />
+</div>
+
+<div class="mb-3">
+    <label for="ageRange">Age Range</label>
+    <br />
+    <StateInputText ValueExpression="() => StateContext.State.AgeRange"
+                    ActionCreator="value => new UpdateAgeRangeAction(value)"
+                    type="range" id="ageRange" min="0" max="100" />
+</div>
+
+<div class="mb-3">
+    <label for="color">Color</label>
+    <br />
+    <StateInputText ValueExpression="() => StateContext.State.Color"
+                    ActionCreator="value => new UpdateColorAction(value)"
+                    type="color" id="color" min="0" max="100" />
+</div>
+
+
+@code {
+    [CascadingParameter]
+    public IStateContext<Model> StateContext { get; set; }
+
+    [CascadingParameter]
+    public IFormContext FormContext { get; set; }
+}
