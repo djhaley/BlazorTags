@@ -30,6 +30,7 @@
     <label for="stateSelect">State</label>
     <StateInputSelect ValueExpression="() => _nestedModel.Selection"
                       ActionCreator="value => new UpdateSelectionAction(value)"
+                      Identifier="stateInput"
                       class="form-control" id="stateSelect">
         <option>Washington</option>
         <option>Idaho</option>
@@ -86,18 +87,9 @@
 
     protected override void OnInitialized()
     {
-        //StateContext.ModelUpdated += (sender, args) => stateSelectionMessage = FormContext.GetValidationMessage(_nestedModel, "Selection");
+        _nestedModel = StateContext.State.Nested;
+        StateContext.StateChanged += (sender, args) => stateSelectionMessage = FormContext.GetValidationMessage("stateInput");
 
         base.OnInitialized();
-    }
-
-    protected override void OnParametersSet()
-    {
-        Console.WriteLine($"nested form (1) on parameters set: {_nestedModel}");
-        _nestedModel = StateContext.State.Nested;
-        stateSelectionMessage = FormContext.GetValidationMessage(_nestedModel, "Selection");
-        Console.WriteLine($"nested form (2) on parameters set: {_nestedModel}");
-
-        base.OnParametersSet();
     }
 }

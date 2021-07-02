@@ -17,7 +17,7 @@ namespace BlazorTags.State
 
         // State itself may encompass much more than form fields, but for tracking what
         //  is displayed on a form we'll capture anything registered by an input
-        private List<IPropertyData> _formFields = new List<IPropertyData>();
+        private Dictionary<string, IFormField> _formFields = new Dictionary<string, IFormField>();
 
         public StateContext(TState initialState)
         {
@@ -26,62 +26,45 @@ namespace BlazorTags.State
         }
 
         public event EventHandler<StateChangedEventArgs> StateChanged;
-        public event EventHandler<StateChangedEventArgs> ModelUpdated;
 
         public TState State { get => _state; }
 
-        public bool TryGetPropertyData(object model, string propertyName, out IPropertyData propertyData)
+        public bool TryGetFormField(string id, out IFormField formField)
         {
-            propertyData = GetPropertyData(model, propertyName);
-            return propertyData != null;
+            formField = GetFormField(id);
+            return formField != null;
         }
 
-        public string GetValidationMessage(object model, string propertyName)
+        public string GetValidationMessage(string id)
         {
-            Console.WriteLine($"Getting validation message for {propertyName}");
-
-            if (!TryGetPropertyData(model, propertyName, out IPropertyData propertyData))
-            {
-                Console.WriteLine($"Property data not found for {propertyName}");
-                //Console.WriteLine(model);
-                //_formFields.ForEach(field => Console.WriteLine(field.Model));
-                return "";
-            }
-            return propertyData.ValidationMessage;
+            if (!TryGetFormField(id, out IFormField formField)) return "";
+            return formField.ValidationMessage;
         }
 
-        public IPropertyData GetPropertyData(object model, string propertyName)
+        public IFormField GetFormField(string id)
         {
-            return _formFields.SingleOrDefault(field => ReferenceEquals(model, field.Model) &&
-                string.Equals(propertyName, field.PropertyName, StringComparison.Ordinal));
+            if (!_formFields.ContainsKey(id)) return null;
+            return _formFields[id];
         }
 
         public void Dispatch(IStateAction action)
         {
-            Console.WriteLine("calling reduce");
-            _state = _rootReducer.Reduce(_state, action);
+            foreach (var field in _formFields)
+            {
+                field.Value.IsValid = true;
+                field.Value.ValidationMessage = "";
+            }
 
-            Console.WriteLine("validating");
+            _state = _rootReducer.Reduce(_state, action);
             _rootReducer.Validate(_state, this);
 
             NotifyOfStateChange();
-
-            Console.WriteLine("updating models");
-            _formFields.ForEach(field => 
-            {
-                field.UpdateModel();
-                field.IsValid = true;
-            });
-
-            var handler = ModelUpdated;
-            if (handler != null)
-                handler(this, new StateChangedEventArgs());
         }
 
         public bool Validate()
         {
             _rootReducer.Validate(_state, this);
-            return !_formFields.Any(field => !field.IsValid);
+            return !_formFields.Any(field => !field.Value.IsValid);
         }
 
         public void NotifyOfStateChange()
@@ -89,9 +72,10 @@ namespace BlazorTags.State
             OnStateChanged(new StateChangedEventArgs());
         }
 
-        public void RegisterFormField(IPropertyData propertyData)
+        public void RegisterFormField(string id, IFormField formField)
         {
-            if (!_formFields.Contains(propertyData)) _formFields.Add(propertyData);
+            if (!_formFields.ContainsKey(id))
+                _formFields.Add(id, formField);
         }
 
         protected virtual void OnStateChanged(StateChangedEventArgs eventArgs)

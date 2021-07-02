@@ -61,8 +61,6 @@ namespace BlazorTags.State.Forms
         /// <inheritdoc />
         protected override void OnParametersSet()
         {
-            Console.WriteLine("stateform on parameters set");
-
             if (_stateContext == null)
             {
                 throw new InvalidOperationException($"{nameof(StateForm<TState, TReducer>)} requires " +

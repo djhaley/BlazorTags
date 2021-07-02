@@ -15,10 +15,13 @@ using System.Threading.Tasks;
 
 namespace BlazorTags.State.Forms
 {
-    public abstract class StateInputBase<TValue> : ComponentBase
+    public abstract class StateInputBase<TValue> : ComponentBase, IFormField
     {
         private Type _nullableUnderlyingType;
         private PropertyInfo _modelProperty;
+
+        private TValue _originalValue;
+        private bool _originalValueSet = false;
 
         [CascadingParameter] 
         IFormContext CascadedFormContext { get; set; } = default!;
@@ -31,6 +34,13 @@ namespace BlazorTags.State.Forms
 
         [Parameter]
         public Func<TValue, IStateAction> ActionCreator { get; set; }
+
+        [Parameter]
+        public string Identifier { get; set; }
+
+        public bool IsValid { get; set; } = true;
+        public bool IsModified { get => !CurrentValue.Equals(_originalValue); }
+        public string ValidationMessage { get; set; }
 
         public override Task SetParametersAsync(ParameterView parameters)
         {
@@ -48,26 +58,26 @@ namespace BlazorTags.State.Forms
                 throw new InvalidOperationException($"{GetType()} requires a value for the 'Expression' parameter.");
             }
 
-            var expressionPropertyData = new PropertyData<TValue>(ValueExpression);
-            if (CascadedFormContext.TryGetPropertyData(expressionPropertyData.Model, expressionPropertyData.PropertyName, out IPropertyData propertyData))
+            if (string.IsNullOrEmpty(Identifier))
             {
-                PropertyData = propertyData;
+                Identifier = Guid.NewGuid().ToString();
             }
-            else
-            {
-                PropertyData = expressionPropertyData;
-                CascadedFormContext.RegisterFormField(PropertyData);
-            }
+
+            CascadedFormContext.RegisterFormField(Identifier, this);
 
             _nullableUnderlyingType = Nullable.GetUnderlyingType(typeof(TValue));
 
             UpdateAdditionalValidationAttributes();
 
+            if (!_originalValueSet)
+            {
+                _originalValue = GetModelPropertyValue();
+                _originalValueSet = true;
+            }
+
             // For derived components, retain the usual lifecycle with OnInit/OnParametersSet/etc.
             return base.SetParametersAsync(ParameterView.Empty);
         }
-
-        protected IPropertyData PropertyData { get; set; }
 
         protected TValue CurrentValue
         {
@@ -102,7 +112,7 @@ namespace BlazorTags.State.Forms
                 else
                 {
                     // We couldn't parse the value, so we need to flag the field as invalid and let the context know
-                    PropertyData.IsValid = false;
+                    IsValid = false;
                     CascadedFormContext.NotifyOfStateChange();
                 }
             }
@@ -116,21 +126,23 @@ namespace BlazorTags.State.Forms
         {
             get
             {
+                var cssClass = (IsModified ? "modified " : "") + (IsValid ? "valid" : "invalid");
+
                 if (AdditionalAttributes != null &&
                     AdditionalAttributes.TryGetValue("class", out var @class) &&
                     !string.IsNullOrEmpty(Convert.ToString(@class, CultureInfo.InvariantCulture)))
                 {
-                    return $"{@class} {PropertyData.CssClass}";
+                    return $"{@class} {cssClass}";
                 }
 
-                return PropertyData.CssClass;
+                return cssClass;
             }
         }
 
         private void UpdateAdditionalValidationAttributes()
         {
             var hasAriaInvalidAttribute = AdditionalAttributes != null && AdditionalAttributes.ContainsKey("aria-invalid");
-            if (PropertyData.IsValid)
+            if (IsValid)
             {
                 if (hasAriaInvalidAttribute)
                 {
@@ -188,20 +200,14 @@ namespace BlazorTags.State.Forms
 
         private TValue GetModelPropertyValue()
         {
+            ParseAccessor(ValueExpression, out object model, out string propertyName);
+
             if (_modelProperty == null)
             {
-                _modelProperty = PropertyData.Model.GetType().GetProperty(PropertyData.PropertyName, BindingFlags.Public | BindingFlags.Instance);
+                _modelProperty = model.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
             }
 
-            return (TValue)_modelProperty.GetValue(PropertyData.Model);
-        }
-
-        protected override void OnAfterRender(bool firstRender)
-        {
-            ParseAccessor(ValueExpression, out object model, out string propertyName);
-            if (propertyName == "Selection") Console.WriteLine($"on after render: {model}");
-
-            base.OnAfterRender(firstRender);
+            return (TValue)_modelProperty.GetValue(model);
         }
 
         private static void ParseAccessor<T>(Expression<Func<T>> accessor, out object model, out string propertyName)
@@ -218,7 +224,7 @@ namespace BlazorTags.State.Forms
 
             if (!(accessorBody is MemberExpression memberExpression))
             {
-                throw new ArgumentException($"Oops");
+                throw new ArgumentException($"The provided expression contains a {accessorBody.GetType().Name} which is not supported. StateInput* tags only support simple member accessors (fields, properties) of an object.");
             }
 
             // Identify the property name. We don't mind whether it's a property or field, or even something else.
@@ -251,7 +257,7 @@ namespace BlazorTags.State.Forms
             }
             else
             {
-                throw new ArgumentException($"Ooops");
+                throw new ArgumentException($"The provided expression contains a {accessorBody.GetType().Name} which is not supported. StateInput* tags only support simple member accessors (fields, properties) of an object.");
             }
         }
 

@@ -23,6 +23,7 @@
                     <label for="age">Age</label>
                     <StateInputNumber ValueExpression="() => stateContext.State.Age"
                                       ActionCreator="value => new UpdateAgeAction(value)"
+                                      Identifier="ageInput"
                                       class="form-control" id="age" />
                     @if (!string.IsNullOrEmpty(ageMessage))
                     {
@@ -78,7 +79,7 @@
 
         stateContext = new StateContext<Model, Reducer>(model);
 
-        stateContext.ModelUpdated += (sender, args) => ageMessage = stateContext.GetValidationMessage(stateContext.State, "Age");
+        stateContext.StateChanged += (sender, args) => ageMessage = stateContext.GetValidationMessage("ageInput");
 
         base.OnInitialized();
     }

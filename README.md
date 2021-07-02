@@ -23,11 +23,12 @@ See the [example project](https://github.com/djhaley/BlazorTags/tree/main/sample
 - Does not support data annotations
 
 ### Roadmap
-**v1.0.0**
+**v1.0.0** (Will have breaking changes)
 - <State> tag to allow using StateContext outside of a form
 - Model validation using data annotations
 - Refactored interfaces to make usage easier (*breaking change*)
 - Documentation
+- \+ Nested state in ValueExpression
 
-**v0.3.0**
-- Nested state in ValueExpression
+**v0.3.0** (Not releasing due to breaking changes for nested state)
+- ~~Nested state in ValueExpression~~

@@ -29,7 +29,7 @@ namespace BlazorTags.Samples.Reducers
 
         public void Validate(NestedModel state, IFormContext formContext)
         {
-            if (state.Selection != "Washington" && formContext.TryGetPropertyData(state, "Selection", out IPropertyData selectionData))
+            if (state.Selection != "Washington" && formContext.TryGetFormField("stateInput", out IFormField selectionData))
             {
                 selectionData.IsValid = false;
                 selectionData.ValidationMessage = "Washington!!!!!!!";

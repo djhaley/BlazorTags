@@ -27,7 +27,7 @@ namespace BlazorTags.Samples.Reducers
         {
             _nestedReducer.Validate(state.Nested, formContext);
 
-            if (state.Age < 12 && formContext.TryGetPropertyData(state, "Age", out IPropertyData ageData))
+            if (state.Age < 12 && formContext.TryGetFormField("ageInput", out IFormField ageData))
             {
                 ageData.IsValid = false;
                 ageData.ValidationMessage = "You must be 12 to ride this amusement park attraction";
