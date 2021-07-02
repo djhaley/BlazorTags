@@ -17,7 +17,7 @@ namespace BlazorTags.State
 
         // State itself may encompass much more than form fields, but for tracking what
         //  is displayed on a form we'll capture anything registered by an input
-        private List<PropertyData> _formFields = new List<PropertyData>();
+        private List<IPropertyData> _formFields = new List<IPropertyData>();
 
         public StateContext(TState initialState)
         {
@@ -29,7 +29,7 @@ namespace BlazorTags.State
 
         public TState State { get => _state; }
 
-        public bool TryGetPropertyData(object model, string propertyName, out PropertyData propertyData)
+        public bool TryGetPropertyData(object model, string propertyName, out IPropertyData propertyData)
         {
             propertyData = GetPropertyData(model, propertyName);
             return propertyData != null;
@@ -37,11 +37,17 @@ namespace BlazorTags.State
 
         public string GetValidationMessage(object model, string propertyName)
         {
-            if (!TryGetPropertyData(model, propertyName, out PropertyData propertyData)) return "";
+            if (!TryGetPropertyData(model, propertyName, out IPropertyData propertyData))
+            {
+                Console.WriteLine($"Property data not found for {propertyName}");
+                Console.WriteLine(model);
+                _formFields.ForEach(field => Console.WriteLine(field.Model));
+                return "";
+            }
             return propertyData.ValidationMessage;
         }
 
-        public PropertyData GetPropertyData(object model, string propertyName)
+        public IPropertyData GetPropertyData(object model, string propertyName)
         {
             return _formFields.SingleOrDefault(field => ReferenceEquals(model, field.Model) &&
                 string.Equals(propertyName, field.PropertyName, StringComparison.Ordinal));
@@ -49,22 +55,38 @@ namespace BlazorTags.State
 
         public void Dispatch(IStateAction action)
         {
+            Console.WriteLine("calling reduce");
             _state = _rootReducer.Reduce(_state, action);
-            _formFields.ForEach(field => { field.Model = _state; field.IsValid = true; });
 
+            Console.WriteLine("validating");
             _rootReducer.Validate(_state, this);
 
             NotifyOfStateChange();
+
+            Console.WriteLine("updating models");
+            _formFields.ForEach(field => 
+            { 
+                field.UpdateModel(); 
+                field.IsValid = true;
+                if (field.PropertyName == "Selection")
+                {
+                    Console.WriteLine(field.Model);
+                }
+            });
         }
 
-        public bool Validate() => !_formFields.Any(field => !field.IsValid);
+        public bool Validate()
+        {
+            _rootReducer.Validate(_state, this);
+            return !_formFields.Any(field => !field.IsValid);
+        }
 
         public void NotifyOfStateChange()
         {
             OnStateChanged(new StateChangedEventArgs());
         }
 
-        public void RegisterFormField(PropertyData propertyData)
+        public void RegisterFormField(IPropertyData propertyData)
         {
             if (!_formFields.Contains(propertyData)) _formFields.Add(propertyData);
         }

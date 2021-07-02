@@ -59,17 +59,21 @@
 
     protected override void OnInitialized()
     {
-        var model = new Model(
-            "Dan", 
-            29, 
-            true, 
+        var nestedModel = new NestedModel(
             DateTime.Today,
             "Blue",
             "Washington",
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam non commodo dolor, sed porta ipsum.", 
-            0,
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam non commodo dolor, sed porta ipsum.",
             "29",
             "#61ACEB"
+        );
+
+        var model = new Model(
+            "Dan",
+            29,
+            true,
+            0,
+            nestedModel
         );
 
         stateContext = new StateContext<Model, Reducer>(model);

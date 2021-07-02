@@ -4,11 +4,11 @@
     {
         // StateContext methods needed by input components - not aware of TState
 
-        bool TryGetPropertyData(object model, string propertyName, out PropertyData propertyData);
-        PropertyData GetPropertyData(object model, string propertyName);
+        bool TryGetPropertyData(object model, string propertyName, out IPropertyData propertyData);
+        IPropertyData GetPropertyData(object model, string propertyName);
         void Dispatch(IStateAction action);
         void NotifyOfStateChange();
-        void RegisterFormField(PropertyData propertyData);
+        void RegisterFormField(IPropertyData propertyData);
         string GetValidationMessage(object model, string propertyName);
     }
 }

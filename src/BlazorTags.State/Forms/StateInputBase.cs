@@ -48,8 +48,8 @@ namespace BlazorTags.State.Forms
                 throw new InvalidOperationException($"{GetType()} requires a value for the 'Expression' parameter.");
             }
 
-            var expressionPropertyData = PropertyData.Create(ValueExpression);
-            if (CascadedFormContext.TryGetPropertyData(expressionPropertyData.Model, expressionPropertyData.PropertyName, out PropertyData propertyData))
+            var expressionPropertyData = new PropertyData<TValue>(ValueExpression);
+            if (CascadedFormContext.TryGetPropertyData(expressionPropertyData.Model, expressionPropertyData.PropertyName, out IPropertyData propertyData))
             {
                 PropertyData = propertyData;
             }
@@ -67,7 +67,7 @@ namespace BlazorTags.State.Forms
             return base.SetParametersAsync(ParameterView.Empty);
         }
 
-        protected PropertyData PropertyData { get; set; }
+        protected IPropertyData PropertyData { get; set; }
 
         protected TValue CurrentValue
         {

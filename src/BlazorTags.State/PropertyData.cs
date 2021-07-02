@@ -3,6 +3,7 @@
 // ** This class is the based on FieldIdentifier
 // https://github.com/dotnet/aspnetcore/blob/main/src/Components/Forms/src/FieldIdentifier.cs
 
+using BlazorTags.State.Interfaces;
 using Newtonsoft.Json;
 using System;
 using System.Linq.Expressions;
@@ -11,7 +12,7 @@ using System.Runtime.CompilerServices;
 
 namespace BlazorTags.State
 {
-    public class PropertyData : IEquatable<PropertyData>
+    public class PropertyData<TField> : IEquatable<PropertyData<TField>>, IPropertyData
     {
         private object _model;
         private PropertyInfo _propertyInfo;
@@ -19,19 +20,18 @@ namespace BlazorTags.State
         private string _originalValueAsJson;
         private bool _isValid = true;
 
-        public static PropertyData Create<TField>(Expression<Func<TField>> accessor)
+        private Expression<Func<TField>> _accessor;
+
+        public PropertyData(Expression<Func<TField>> accessor)
         {
             if (accessor == null) throw new ArgumentNullException(nameof(accessor));
 
             ParseAccessor(accessor, out object model, out string propertyName);
-            return new PropertyData(model, propertyName);
-        }
 
-        public PropertyData(object model, string propertyName)
-        {
             if (model == null) throw new ArgumentNullException(nameof(model));
             if (model.GetType().IsValueType) throw new ArgumentException("The model must be a reference-typed object.", nameof(model));
 
+            _accessor = accessor;
             _model = model;
             PropertyName = propertyName ?? throw new ArgumentNullException(nameof(propertyName));
 
@@ -42,13 +42,6 @@ namespace BlazorTags.State
         public object Model 
         {
             get => _model;
-            set
-            {
-                if (!value.GetType().Equals(_model.GetType()))
-                    throw new InvalidOperationException($"Updating the {nameof(Model)} property can only be done with the same type of object.");
-
-                _model = value;
-            }
         }
 
         public string PropertyName { get; }
@@ -63,13 +56,23 @@ namespace BlazorTags.State
         }
 
         public string ValidationMessage { get; set; }
-        public string CssClass { get => (IsModified() ? "modified " : "") + (IsValid ? "valid" : "invalid"); }
+        public string CssClass { get => (IsModified ? "modified " : "") + (IsValid ? "valid" : "invalid"); }
 
-        public bool IsModified() 
+        public bool IsModified
         {
-            var currentValueAsJson = JsonConvert.SerializeObject(_propertyInfo.GetValue(_model));
-            return !string.Equals(currentValueAsJson, _originalValueAsJson, StringComparison.Ordinal);
+            get 
+            {
+                var currentValueAsJson = JsonConvert.SerializeObject(_propertyInfo.GetValue(_model));
+                return !string.Equals(currentValueAsJson, _originalValueAsJson, StringComparison.Ordinal);
+            }
         }
+
+        public void UpdateModel()
+        {
+            ParseAccessor(_accessor, out object model, out string _);
+            _model = model;
+        }
+
 
         public override int GetHashCode()
         {
@@ -84,10 +87,10 @@ namespace BlazorTags.State
         }
 
         /// <inheritdoc />
-        public override bool Equals(object obj) => obj is PropertyData otherData && Equals(otherData);
+        public override bool Equals(object obj) => obj is PropertyData<TField> otherData && Equals(otherData);
 
         /// <inheritdoc />
-        public bool Equals(PropertyData otherData)
+        public bool Equals(PropertyData<TField> otherData)
         {
             return ReferenceEquals(otherData.Model, _model) &&
                 string.Equals(otherData.PropertyName, PropertyName, StringComparison.Ordinal);
@@ -107,7 +110,7 @@ namespace BlazorTags.State
 
             if (!(accessorBody is MemberExpression memberExpression))
             {
-                throw new ArgumentException($"The provided expression contains a {accessorBody.GetType().Name} which is not supported. {nameof(PropertyData)} only supports simple member accessors (fields, properties) of an object.");
+                throw new ArgumentException($"The provided expression contains a {accessorBody.GetType().Name} which is not supported. {nameof(PropertyData<TField>)} only supports simple member accessors (fields, properties) of an object.");
             }
 
             // Identify the property name. We don't mind whether it's a property or field, or even something else.
@@ -140,7 +143,7 @@ namespace BlazorTags.State
             }
             else
             {
-                throw new ArgumentException($"The provided expression contains a {accessorBody.GetType().Name} which is not supported. {nameof(PropertyData)} only supports simple member accessors (fields, properties) of an object.");
+                throw new ArgumentException($"The provided expression contains a {accessorBody.GetType().Name} which is not supported. {nameof(PropertyData<TField>)} only supports simple member accessors (fields, properties) of an object.");
             }
         }
     }
