@@ -19,7 +19,6 @@ See the [example project](https://github.com/djhaley/BlazorTags/tree/main/sample
 
 
 ### Known Issues
-- Unable to use nested state in ValueExpression
 - Does not support data annotations
 
 ### Roadmap
