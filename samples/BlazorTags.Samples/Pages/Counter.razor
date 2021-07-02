@@ -23,6 +23,7 @@
                     <label for="age">Age</label>
                     <StateInputNumber ValueExpression="() => stateContext.State.Age"
                                       ActionCreator="value => new UpdateAgeAction(value)"
+                                      Identifier="ageInput"
                                       class="form-control" id="age" />
                     @if (!string.IsNullOrEmpty(ageMessage))
                     {
@@ -59,22 +60,26 @@
 
     protected override void OnInitialized()
     {
-        var model = new Model(
-            "Dan", 
-            29, 
-            true, 
+        var nestedModel = new NestedModel(
             DateTime.Today,
             "Blue",
             "Washington",
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam non commodo dolor, sed porta ipsum.", 
-            0,
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam non commodo dolor, sed porta ipsum.",
             "29",
             "#61ACEB"
         );
 
+        var model = new Model(
+            "Dan",
+            29,
+            true,
+            0,
+            nestedModel
+        );
+
         stateContext = new StateContext<Model, Reducer>(model);
 
-        stateContext.StateChanged += (sender, args) => ageMessage = stateContext.GetValidationMessage(stateContext.State, "Age");
+        stateContext.StateChanged += (sender, args) => ageMessage = stateContext.GetValidationMessage("ageInput");
 
         base.OnInitialized();
     }

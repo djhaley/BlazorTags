@@ -17,7 +17,7 @@ namespace BlazorTags.State
 
         // State itself may encompass much more than form fields, but for tracking what
         //  is displayed on a form we'll capture anything registered by an input
-        private List<PropertyData> _formFields = new List<PropertyData>();
+        private Dictionary<string, IFormField> _formFields = new Dictionary<string, IFormField>();
 
         public StateContext(TState initialState)
         {
@@ -29,44 +29,53 @@ namespace BlazorTags.State
 
         public TState State { get => _state; }
 
-        public bool TryGetPropertyData(object model, string propertyName, out PropertyData propertyData)
+        public bool TryGetFormField(string id, out IFormField formField)
         {
-            propertyData = GetPropertyData(model, propertyName);
-            return propertyData != null;
+            formField = GetFormField(id);
+            return formField != null;
         }
 
-        public string GetValidationMessage(object model, string propertyName)
+        public string GetValidationMessage(string id)
         {
-            if (!TryGetPropertyData(model, propertyName, out PropertyData propertyData)) return "";
-            return propertyData.ValidationMessage;
+            if (!TryGetFormField(id, out IFormField formField)) return "";
+            return formField.ValidationMessage;
         }
 
-        public PropertyData GetPropertyData(object model, string propertyName)
+        public IFormField GetFormField(string id)
         {
-            return _formFields.SingleOrDefault(field => ReferenceEquals(model, field.Model) &&
-                string.Equals(propertyName, field.PropertyName, StringComparison.Ordinal));
+            if (!_formFields.ContainsKey(id)) return null;
+            return _formFields[id];
         }
 
         public void Dispatch(IStateAction action)
         {
-            _state = _rootReducer.Reduce(_state, action);
-            _formFields.ForEach(field => { field.Model = _state; field.IsValid = true; });
+            foreach (var field in _formFields)
+            {
+                field.Value.IsValid = true;
+                field.Value.ValidationMessage = "";
+            }
 
+            _state = _rootReducer.Reduce(_state, action);
             _rootReducer.Validate(_state, this);
 
             NotifyOfStateChange();
         }
 
-        public bool Validate() => !_formFields.Any(field => !field.IsValid);
+        public bool Validate()
+        {
+            _rootReducer.Validate(_state, this);
+            return !_formFields.Any(field => !field.Value.IsValid);
+        }
 
         public void NotifyOfStateChange()
         {
             OnStateChanged(new StateChangedEventArgs());
         }
 
-        public void RegisterFormField(PropertyData propertyData)
+        public void RegisterFormField(string id, IFormField formField)
         {
-            if (!_formFields.Contains(propertyData)) _formFields.Add(propertyData);
+            if (!_formFields.ContainsKey(id))
+                _formFields.Add(id, formField);
         }
 
         protected virtual void OnStateChanged(StateChangedEventArgs eventArgs)
