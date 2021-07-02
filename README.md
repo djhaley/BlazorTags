@@ -17,6 +17,17 @@ BlazorTags.State is an easy-to-use replacement for EditForm, EditContext, and th
 ### Example
 See the [example project](https://github.com/djhaley/BlazorTags/tree/main/samples/BlazorTags.Samples) located in the source repository.
 
+
 ### Known Issues
 - Unable to use nested state in ValueExpression
 - Does not support data annotations
+
+### Roadmap
+**v1.0.0**
+- <State> tag to allow using StateContext outside of a form
+- Model validation using data annotations
+- Refactored interfaces to make usage easier (*breaking change*)
+- Documentation
+
+**v0.3.0**
+- Nested state in ValueExpression
