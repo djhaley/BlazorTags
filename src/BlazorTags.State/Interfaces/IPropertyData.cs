@@ -9,6 +9,6 @@
         string CssClass { get; }
         bool IsModified { get; }
 
-        void UpdateModel();        
+        void UpdateModel();
     }
 }

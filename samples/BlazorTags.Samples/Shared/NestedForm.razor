@@ -36,9 +36,9 @@
         <option>Montana</option>
     </StateInputSelect>
 
-    @if (!string.IsNullOrEmpty(FormContext.GetValidationMessage(_nestedModel, "Selection")))
+    @if (!string.IsNullOrEmpty(stateSelectionMessage))
     {
-        <small class="form-text text-muted">@FormContext.GetValidationMessage(_nestedModel, "Selection")</small>
+        <small class="form-text text-muted">@stateSelectionMessage</small>
     }
 </div>
 
@@ -82,9 +82,22 @@
 
     private NestedModel _nestedModel;
 
+    private string stateSelectionMessage;
+
+    protected override void OnInitialized()
+    {
+        //StateContext.ModelUpdated += (sender, args) => stateSelectionMessage = FormContext.GetValidationMessage(_nestedModel, "Selection");
+
+        base.OnInitialized();
+    }
+
     protected override void OnParametersSet()
     {
+        Console.WriteLine($"nested form (1) on parameters set: {_nestedModel}");
         _nestedModel = StateContext.State.Nested;
+        stateSelectionMessage = FormContext.GetValidationMessage(_nestedModel, "Selection");
+        Console.WriteLine($"nested form (2) on parameters set: {_nestedModel}");
+
         base.OnParametersSet();
     }
 }

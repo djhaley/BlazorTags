@@ -69,7 +69,8 @@ namespace BlazorTags.State
 
         public void UpdateModel()
         {
-            ParseAccessor(_accessor, out object model, out string _);
+            ParseAccessor(_accessor, out object model, out string pn);
+            if (pn == "Selection") Console.WriteLine($"{pn}: {model}");
             _model = model;
         }
 

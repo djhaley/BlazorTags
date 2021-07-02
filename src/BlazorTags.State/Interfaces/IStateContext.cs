@@ -7,6 +7,7 @@ namespace BlazorTags.State.Interfaces
         // State methods used by non-Input components - TState aware
 
         event EventHandler<StateChangedEventArgs> StateChanged;
+        event EventHandler<StateChangedEventArgs> ModelUpdated;
 
         TState State { get; }
         void Dispatch(IStateAction action);

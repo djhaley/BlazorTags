@@ -78,7 +78,7 @@
 
         stateContext = new StateContext<Model, Reducer>(model);
 
-        stateContext.StateChanged += (sender, args) => ageMessage = stateContext.GetValidationMessage(stateContext.State, "Age");
+        stateContext.ModelUpdated += (sender, args) => ageMessage = stateContext.GetValidationMessage(stateContext.State, "Age");
 
         base.OnInitialized();
     }

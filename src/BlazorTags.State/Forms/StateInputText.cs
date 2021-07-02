@@ -30,10 +30,5 @@ namespace BlazorTags.State.Forms
             result = value;
             return true;
         }
-
-        protected override void OnAfterRender(bool firstRender)
-        {
-            base.OnAfterRender(firstRender);
-        }
     }
 }

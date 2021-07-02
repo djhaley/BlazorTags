@@ -26,6 +26,7 @@ namespace BlazorTags.State
         }
 
         public event EventHandler<StateChangedEventArgs> StateChanged;
+        public event EventHandler<StateChangedEventArgs> ModelUpdated;
 
         public TState State { get => _state; }
 
@@ -37,11 +38,13 @@ namespace BlazorTags.State
 
         public string GetValidationMessage(object model, string propertyName)
         {
+            Console.WriteLine($"Getting validation message for {propertyName}");
+
             if (!TryGetPropertyData(model, propertyName, out IPropertyData propertyData))
             {
                 Console.WriteLine($"Property data not found for {propertyName}");
-                Console.WriteLine(model);
-                _formFields.ForEach(field => Console.WriteLine(field.Model));
+                //Console.WriteLine(model);
+                //_formFields.ForEach(field => Console.WriteLine(field.Model));
                 return "";
             }
             return propertyData.ValidationMessage;
@@ -65,14 +68,14 @@ namespace BlazorTags.State
 
             Console.WriteLine("updating models");
             _formFields.ForEach(field => 
-            { 
-                field.UpdateModel(); 
+            {
+                field.UpdateModel();
                 field.IsValid = true;
-                if (field.PropertyName == "Selection")
-                {
-                    Console.WriteLine(field.Model);
-                }
             });
+
+            var handler = ModelUpdated;
+            if (handler != null)
+                handler(this, new StateChangedEventArgs());
         }
 
         public bool Validate()
